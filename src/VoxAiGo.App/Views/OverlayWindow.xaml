@@ -1,0 +1,123 @@
+<Window x:Class="VoxAiGo.App.Views.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:VoxAiGo.App.Controls"
+        xmlns:vm="clr-namespace:VoxAiGo.App.ViewModels"
+        mc:Ignorable="d"
+        Title="VoxAiGo Overlay" Height="72" Width="300"
+        WindowStyle="None" AllowsTransparency="False" Background="#141414"
+        Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
+
+    <Window.Resources>
+        <!-- Inline resources for OverlayWindow to work standalone -->
+        <SolidColorBrush x:Key="AppBg" Color="#0A0A0A" />
+        <SolidColorBrush x:Key="SurfaceBg" Color="#141414" />
+        <SolidColorBrush x:Key="BorderColor" Color="#1F1F1F" />
+        <SolidColorBrush x:Key="GoldPrimary" Color="#D4AF37" />
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#8A8A8A" />
+        <SolidColorBrush x:Key="SuccessColor" Color="#34C759" />
+        <Style x:Key="BodyText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        </Style>
+        <Style x:Key="CaptionText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        </Style>
+    </Window.Resources>
+
+    <!-- Capsule HUD — matches macOS "Matte Black &amp; Gold" design -->
+    <Border x:Name="HudCapsule" CornerRadius="24" Padding="24,14" BorderThickness="2" Background="#1F1F1F" BorderBrush="#D4AF37">
+
+        <Grid>
+            <!-- STATE 1: IDLE — "Ctrl+Space hold to talk" (shown when not recording and not processing) -->
+            <StackPanel x:Name="IdleState" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!-- Mic icon circle -->
+                <Border Background="{StaticResource TextPrimary}" CornerRadius="14" Width="28" Height="28" Margin="0,0,12,0">
+                    <TextBlock Text="&#xE720;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                               Foreground="{StaticResource AppBg}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Segure" Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <!-- Shortcut badge -->
+                <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="8,4">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Ctrl" Foreground="{StaticResource TextPrimary}" Style="{StaticResource CaptionText}" FontWeight="Medium"/>
+                        <TextBlock Text=" + " FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                        <TextBlock Text="Space" Foreground="{StaticResource TextPrimary}" Style="{StaticResource CaptionText}" FontWeight="Medium"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- STATE 2: LISTENING — Mic + Waves | "Ouvindo..." | [PT] [Texto] -->
+            <StackPanel x:Name="ListeningState" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="Collapsed">
+                <!-- Mic icon (red when speech detected) -->
+                <Border x:Name="MicCircle" Background="{StaticResource TextPrimary}" CornerRadius="16" Width="32" Height="32" Margin="0,0,12,0">
+                    <TextBlock Text="&#xE720;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                               Foreground="{StaticResource AppBg}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+
+                <!-- Sound waves -->
+                <controls:SoundWaveControl AudioLevel="{Binding AudioLevel}" Width="80" Height="28" Foreground="{StaticResource GoldPrimary}" Margin="0,0,10,0"/>
+
+                <!-- Divider -->
+                <Border Width="1" Height="28" Background="{StaticResource BorderColor}" Margin="8,0"/>
+
+                <!-- Status text -->
+                <TextBlock Text="Ouvindo..." Style="{StaticResource BodyText}" Foreground="{StaticResource TextPrimary}" FontWeight="Medium"
+                           VerticalAlignment="Center" Margin="12,0,16,0"/>
+
+                <!-- Language pill -->
+                <Border Background="#1AD4AF37" BorderBrush="{StaticResource GoldPrimary}" BorderThickness="1" CornerRadius="6"
+                        Padding="8,4" Margin="0,0,8,0">
+                    <TextBlock Text="{Binding CurrentLanguage.Code, FallbackValue='PT'}"
+                               Foreground="{StaticResource GoldPrimary}" Style="{StaticResource CaptionText}" FontWeight="Bold"/>
+                </Border>
+
+                <!-- Mode pill -->
+                <Border Background="{StaticResource GoldPrimary}" CornerRadius="6" Padding="8,4">
+                    <TextBlock Text="{Binding CurrentMode, FallbackValue='Texto'}"
+                               Foreground="{StaticResource AppBg}" Style="{StaticResource CaptionText}" FontWeight="SemiBold"/>
+                </Border>
+            </StackPanel>
+
+            <!-- STATE 3: PROCESSING — Sparkles + "Processando..." -->
+            <StackPanel x:Name="ProcessingState" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="Collapsed">
+                <TextBlock x:Name="SparkleIcon" Text="&#xE734;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                           Foreground="{StaticResource GoldPrimary}" VerticalAlignment="Center" Margin="0,0,12,0"
+                           RenderTransformOrigin="0.5,0.5">
+                    <TextBlock.RenderTransform>
+                        <RotateTransform x:Name="SparkleRotation" Angle="0"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock Text="Processando..." Foreground="{StaticResource GoldPrimary}" Style="{StaticResource BodyText}" FontWeight="Medium"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- STATE 4: SUCCESS — ✓ Colado -->
+            <StackPanel x:Name="SuccessState" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="Collapsed">
+                <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                           Foreground="{StaticResource SuccessColor}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="Colado" Foreground="{StaticResource SuccessColor}" Style="{StaticResource BodyText}" FontWeight="Medium"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- STATE 5: ERROR — ⚠ message -->
+            <StackPanel x:Name="ErrorState" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="Collapsed">
+                <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                           Foreground="#FF8C00" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock x:Name="ErrorText" Text="Erro" Foreground="#FF8C00" Style="{StaticResource BodyText}"
+                           VerticalAlignment="Center" MaxWidth="350" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

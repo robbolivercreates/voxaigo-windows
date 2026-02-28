@@ -1,0 +1,22 @@
+# Build outputs
+bin/
+obj/
+publish/
+*.user
+*.suo
+
+# .NET
+*.nupkg
+project.lock.json
+artifacts/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
