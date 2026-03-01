@@ -1,3 +1,6 @@
+using System.Text;
+using VoxAiGo.Core.Services;
+
 namespace VoxAiGo.Core.Managers;
 
 public class WritingStyleManager
@@ -9,26 +12,8 @@ public class WritingStyleManager
 
     public event Action? StyleChanged;
 
-    // 0 = casual, 50 = neutral, 100 = formal
-    public int FormalityLevel
-    {
-        get => _settings.GetInt("writing_formality", 50);
-        set { _settings.Set("writing_formality", value); StyleChanged?.Invoke(); }
-    }
-
-    // 0 = concise, 50 = balanced, 100 = detailed
-    public int VerbosityLevel
-    {
-        get => _settings.GetInt("writing_verbosity", 50);
-        set { _settings.Set("writing_verbosity", value); StyleChanged?.Invoke(); }
-    }
-
-    // 0 = simple, 50 = moderate, 100 = highly technical
-    public int TechnicalLevel
-    {
-        get => _settings.GetInt("writing_technical", 50);
-        set { _settings.Set("writing_technical", value); StyleChanged?.Invoke(); }
-    }
+    private const int MaxSamples = 3;
+    private const int MaxCharsPerSample = 300;
 
     public string CustomInstructions
     {
@@ -45,34 +30,42 @@ public class WritingStyleManager
     private WritingStyleManager() { }
 
     /// <summary>
-    /// Generates a style instruction string to append to the system prompt.
+    /// Generates a style personalization string based on previous transcription samples.
+    /// Mirrors macOS WritingStyleManager behavior.
     /// </summary>
-    public string GetStylePrompt()
+    public string GetStylePrompt(IReadOnlyList<TranscriptionRecord>? recentRecords = null)
     {
         if (!IsEnabled) return "";
 
-        var parts = new List<string>();
+        var samples = recentRecords?
+            .Where(r => !string.IsNullOrWhiteSpace(r.Text) && r.Text.Length >= 20)
+            .Take(MaxSamples)
+            .ToList() ?? [];
 
-        if (FormalityLevel < 30)
-            parts.Add("Use a casual, conversational tone.");
-        else if (FormalityLevel > 70)
-            parts.Add("Use a formal, professional tone.");
+        if (samples.Count == 0 && string.IsNullOrWhiteSpace(CustomInstructions))
+            return "";
 
-        if (VerbosityLevel < 30)
-            parts.Add("Be very concise and brief.");
-        else if (VerbosityLevel > 70)
-            parts.Add("Be detailed and thorough.");
+        var sb = new StringBuilder();
+        sb.Append("\n\nWRITING STYLE PERSONALIZATION:");
 
-        if (TechnicalLevel < 30)
-            parts.Add("Use simple, non-technical language.");
-        else if (TechnicalLevel > 70)
-            parts.Add("Use precise technical terminology.");
+        if (samples.Count > 0)
+        {
+            sb.Append("\nMatch the user's writing style based on these previous examples:\n");
+            for (int i = 0; i < samples.Count; i++)
+            {
+                var text = samples[i].Text;
+                if (text.Length > MaxCharsPerSample)
+                    text = text[..MaxCharsPerSample];
+                sb.Append($"\nExample {i + 1}:\n{text}");
+            }
+            sb.Append("\n\nMimic their vocabulary, sentence structure, tone, and formatting preferences.");
+        }
 
         if (!string.IsNullOrWhiteSpace(CustomInstructions))
-            parts.Add(CustomInstructions.Trim());
+        {
+            sb.Append($"\n{CustomInstructions.Trim()}");
+        }
 
-        return parts.Count > 0
-            ? "\n\nWRITING STYLE INSTRUCTIONS:\n" + string.Join("\n", parts)
-            : "";
+        return sb.ToString();
     }
 }

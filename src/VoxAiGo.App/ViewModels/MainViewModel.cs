@@ -79,7 +79,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // Initialize BYOK if user has their own key (easter egg)
         if (_settings.HasByokKey)
-            _byokService = new GeminiTranscriptionService(_settings.ByokApiKey);
+            _byokService = new GeminiTranscriptionService(_settings.ByokApiKey, _historyService);
 
         _hotkeyManager.HoldStarted += OnHoldStarted;
         _hotkeyManager.HoldStopped += OnHoldStopped;
@@ -121,7 +121,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void SetAuthService(AuthService authService)
     {
         _authService = authService;
-        _supabaseService = new SupabaseTranscriptionService(authService);
+        _supabaseService = new SupabaseTranscriptionService(authService, _historyService);
 
         // Fetch profile on init if logged in
         if (authService.IsLoggedIn)
@@ -173,7 +173,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void UpdateByokKey(string apiKey)
     {
         if (!string.IsNullOrWhiteSpace(apiKey) && _settings.ByokEnabled)
-            _byokService = new GeminiTranscriptionService(apiKey);
+            _byokService = new GeminiTranscriptionService(apiKey, _historyService);
         else
             _byokService = null;
     }

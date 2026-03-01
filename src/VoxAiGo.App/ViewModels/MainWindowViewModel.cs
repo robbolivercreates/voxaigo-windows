@@ -133,20 +133,10 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ===== Style Section =====
     [ObservableProperty] private bool _styleEnabled;
-    [ObservableProperty] private int _formalityLevel;
-    [ObservableProperty] private int _verbosityLevel;
-    [ObservableProperty] private int _technicalLevel;
     [ObservableProperty] private string _customInstructions = "";
 
     partial void OnStyleEnabledChanged(bool value) => _writingStyle.IsEnabled = value;
-    partial void OnFormalityLevelChanged(int value) => _writingStyle.FormalityLevel = value;
-    partial void OnVerbosityLevelChanged(int value) => _writingStyle.VerbosityLevel = value;
-    partial void OnTechnicalLevelChanged(int value) => _writingStyle.TechnicalLevel = value;
     partial void OnCustomInstructionsChanged(string value) => _writingStyle.CustomInstructions = value;
-
-    public string FormalityLabel => FormalityLevel < 30 ? "Casual" : FormalityLevel > 70 ? "Formal" : "Neutral";
-    public string VerbosityLabel => VerbosityLevel < 30 ? "Concise" : VerbosityLevel > 70 ? "Detailed" : "Balanced";
-    public string TechnicalLabel => TechnicalLevel < 30 ? "Simple" : TechnicalLevel > 70 ? "Technical" : "Moderate";
 
     // ===== Toast Notification =====
     [ObservableProperty] private string _toastMessage = "";
@@ -334,9 +324,6 @@ public partial class MainWindowViewModel : ObservableObject
 
         // Load style settings
         StyleEnabled = _writingStyle.IsEnabled;
-        FormalityLevel = _writingStyle.FormalityLevel;
-        VerbosityLevel = _writingStyle.VerbosityLevel;
-        TechnicalLevel = _writingStyle.TechnicalLevel;
         CustomInstructions = _writingStyle.CustomInstructions;
 
         // Initialize languages and modes

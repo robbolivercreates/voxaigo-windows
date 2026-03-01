@@ -12,18 +12,20 @@ public class GeminiTranscriptionService : ITranscriptionService
 {
     private readonly string _apiKey;
     private readonly HttpClient _httpClient;
+    private readonly HistoryService? _historyService;
     private const string Model = "gemini-2.5-flash";
     private const string BaseUrl = "https://generativelanguage.googleapis.com/v1beta/models";
 
-    public GeminiTranscriptionService(string apiKey)
+    public GeminiTranscriptionService(string apiKey, HistoryService? historyService = null)
     {
         _apiKey = apiKey;
+        _historyService = historyService;
         _httpClient = new HttpClient();
     }
 
     public async Task<string> TranscribeAsync(byte[] audioData, TranscriptionMode mode, SpeechLanguage outputLanguage)
     {
-        var stylePrompt = WritingStyleManager.Shared.GetStylePrompt();
+        var stylePrompt = WritingStyleManager.Shared.GetStylePrompt(_historyService?.Records);
         var wakeWord = SettingsManager.Shared.WakeWord;
         var prompt = PromptBuilder.Build(mode, outputLanguage, clarifyText: SettingsManager.Shared.ClarifyText,
             wakeWord: wakeWord, styleSamples: stylePrompt);

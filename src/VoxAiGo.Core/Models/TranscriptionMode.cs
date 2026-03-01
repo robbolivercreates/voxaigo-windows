@@ -78,7 +78,7 @@ public static class TranscriptionModeExtensions
             TranscriptionMode.Translation => 4096,
             TranscriptionMode.XTweet => 512,
             TranscriptionMode.VibeCoder => 1024,
-            TranscriptionMode.Custom => 4096,
+            TranscriptionMode.Custom => 2048,
             _ => 2048
         };
     }

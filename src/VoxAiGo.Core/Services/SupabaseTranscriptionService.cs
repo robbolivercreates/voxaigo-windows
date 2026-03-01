@@ -15,10 +15,12 @@ public class SupabaseTranscriptionService : ITranscriptionService
 {
     private readonly AuthService _authService;
     private readonly HttpClient _httpClient;
+    private readonly HistoryService? _historyService;
 
-    public SupabaseTranscriptionService(AuthService authService)
+    public SupabaseTranscriptionService(AuthService authService, HistoryService? historyService = null)
     {
         _authService = authService;
+        _historyService = historyService;
         _httpClient = new HttpClient();
     }
 
@@ -28,7 +30,7 @@ public class SupabaseTranscriptionService : ITranscriptionService
             throw new Exception("Not authenticated. Please sign in.");
 
         var audioBase64 = Convert.ToBase64String(audioData);
-        var stylePrompt = WritingStyleManager.Shared.GetStylePrompt();
+        var stylePrompt = WritingStyleManager.Shared.GetStylePrompt(_historyService?.Records);
         var wakeWord = SettingsManager.Shared.WakeWord;
         var prompt = PromptBuilder.Build(mode, outputLanguage, clarifyText: SettingsManager.Shared.ClarifyText,
             wakeWord: wakeWord, styleSamples: stylePrompt);
