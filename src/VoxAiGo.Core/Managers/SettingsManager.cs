@@ -208,6 +208,28 @@ public class SettingsManager
         set => Set(Keys.ClarifyText, value);
     }
 
+    // --- Favorite Languages ---
+    public List<string> FavoriteLanguages
+    {
+        get
+        {
+            var str = GetString(Keys.FavoriteLanguages, "[\"pt\", \"en\"]");
+            try
+            {
+                return JsonSerializer.Deserialize<List<string>>(str) ?? new List<string> { "pt", "en" };
+            }
+            catch
+            {
+                return new List<string> { "pt", "en" };
+            }
+        }
+        set
+        {
+            var str = JsonSerializer.Serialize(value);
+            Set(Keys.FavoriteLanguages, str);
+        }
+    }
+
     // --- BYOK (Bring Your Own Key) - Easter egg ---
     public bool ByokEnabled
     {

@@ -86,6 +86,10 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private int _todayTranscriptions = 0;
     [ObservableProperty] private int _totalTranscriptions = 0;
     [ObservableProperty] private int _dailyStreak = 0;
+    [ObservableProperty] private string _greeting = "Boa tarde";
+    [ObservableProperty] private string _totalRecordedTime = "0h 0m";
+    [ObservableProperty] private string _topModeName = "Texto";
+    [ObservableProperty] private int _numberOfLanguages = 2;
     [ObservableProperty] private string _shortcutHint = "Ctrl + Space (hold)";
     [ObservableProperty] private string _recordingStatus = "";
     [ObservableProperty] private string _recordingStatusColor = "#888";
@@ -103,6 +107,7 @@ public partial class MainWindowViewModel : ObservableObject
     // ===== Languages Section =====
     [ObservableProperty] private ObservableCollection<LanguageItem> _languages = [];
     [ObservableProperty] private string _languageSearchText = "";
+    [ObservableProperty] private ObservableCollection<LanguageItem> _favoriteLanguagesItems = [];
 
     public ObservableCollection<LanguageItem> FilteredLanguages
     {
@@ -123,8 +128,24 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(FilteredLanguages));
     }
 
+    private void UpdateFavoriteLanguagesList()
+    {
+        var favCodes = _settings.FavoriteLanguages;
+        var favItems = favCodes.Select(code => Languages.FirstOrDefault(l => l.Code == code))
+                               .Where(l => l != null)
+                               .Cast<LanguageItem>()
+                               .ToList();
+        FavoriteLanguagesItems = new ObservableCollection<LanguageItem>(favItems);
+    }
+
     // ===== Modes Section =====
     [ObservableProperty] private ObservableCollection<ModeItem> _modes = [];
+    [ObservableProperty] private bool _enableConversationReply;
+
+    partial void OnEnableConversationReplyChanged(bool value)
+    {
+        _settings.Set("enable_conversation_reply", value);
+    }
 
     // ===== Snippets Section =====
     [ObservableProperty] private ObservableCollection<Snippet> _snippetsList = [];
@@ -265,6 +286,8 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private string _downloadStatus = "";
     [ObservableProperty] private List<TranscriptionRecord> _historyRecords = [];
 
+    public IEnumerable<TranscriptionRecord> RecentTranscriptions => HistoryRecords.Take(5);
+
     // Events for App.xaml.cs wiring
     public event Action<bool>? UseLocalModelChanged;
     public event Action<string>? ApiKeyChanged;
@@ -300,7 +323,10 @@ public partial class MainWindowViewModel : ObservableObject
 
         // History
         _historyService.HistoryChanged += () =>
+        {
             HistoryRecords = _historyService.Records.ToList();
+            OnPropertyChanged(nameof(RecentTranscriptions));
+        };
         HistoryRecords = _historyService.Records.ToList();
 
         // Subscription
@@ -350,6 +376,7 @@ public partial class MainWindowViewModel : ObservableObject
                 IsLocked = !lang.IsFreeTier && !sub.IsPro && !TrialManager.Shared.IsTrialActive()
             });
         }
+        UpdateFavoriteLanguagesList();
     }
 
     private void InitModes()
@@ -392,6 +419,19 @@ public partial class MainWindowViewModel : ObservableObject
         TodayTranscriptions = _analytics.TodayTranscriptions;
         TotalTranscriptions = _analytics.TotalTranscriptions;
         DailyStreak = _analytics.DailyStreak;
+
+        var hour = DateTime.Now.Hour;
+        if (hour < 12) Greeting = "Bom dia";
+        else if (hour < 18) Greeting = "Boa tarde";
+        else Greeting = "Boa noite";
+
+        var minutes = _historyService.Records.Sum(r => r.DurationMs) / 60000;
+        TotalRecordedTime = $"{minutes / 60}h {minutes % 60}m";
+
+        var topMode = _historyService.Records.GroupBy(r => r.Mode).OrderByDescending(g => g.Count()).FirstOrDefault();
+        TopModeName = topMode?.Key ?? "Texto";
+
+        NumberOfLanguages = _settings.FavoriteLanguages.Count > 0 ? _settings.FavoriteLanguages.Count : 2;
     }
 
     private void UpdateAuthStatus()
@@ -694,8 +734,42 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(Languages));
         OnPropertyChanged(nameof(FilteredLanguages));
         UpdateCurrentModeLanguage();
+        UpdateFavoriteLanguagesList();
         LanguageChanged?.Invoke(code);
         WizardBus.FireLanguageChanged(code);
+    }
+
+    [RelayCommand]
+    private void AddFavoriteLanguage(string code)
+    {
+        var favs = _settings.FavoriteLanguages;
+        if (!favs.Contains(code))
+        {
+            favs.Add(code);
+            _settings.FavoriteLanguages = favs;
+            UpdateFavoriteLanguagesList();
+            UpdateHomeStats();
+        }
+        LanguageSearchText = ""; // Clear search after adding
+    }
+
+    [RelayCommand]
+    private void RemoveFavoriteLanguage(string code)
+    {
+        var favs = _settings.FavoriteLanguages;
+        if (favs.Contains(code) && favs.Count > 1) // Keep at least one
+        {
+            favs.Remove(code);
+            _settings.FavoriteLanguages = favs;
+            UpdateFavoriteLanguagesList();
+            UpdateHomeStats();
+            
+            // If removed selected, pick first
+            if (_settings.SelectedLanguage == code && favs.Count > 0)
+            {
+                SelectLanguage(favs.First());
+            }
+        }
     }
 
     // ===== Mode Commands =====

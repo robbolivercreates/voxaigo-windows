@@ -32,9 +32,12 @@ public partial class OverlayWindow : Window
                     case nameof(MainViewModel.IsOverlayVisible):
                         if (_viewModel.IsOverlayVisible)
                         {
-                            PositionOverlay();
-                            Show();
-                            FadeIn();
+                            if (Visibility != Visibility.Visible || Opacity == 0)
+                            {
+                                PositionOverlay();
+                                Show();
+                                FadeIn();
+                            }
                             UpdateHudState();
                         }
                         else
@@ -56,9 +59,30 @@ public partial class OverlayWindow : Window
                         }
                         break;
 
+                    case nameof(MainViewModel.StatusText):
+                        if (!_viewModel.IsOverlayVisible && !_viewModel.IsRecording && !_viewModel.IsProcessing)
+                        {
+                            if (_viewModel.StatusText.StartsWith("Language switched to:") || 
+                                _viewModel.StatusText.StartsWith("Language:"))
+                            {
+                                var text = _viewModel.StatusText.Replace("Language switched to: ", "").Replace("Language: ", "");
+                                ShowNotificationState("\uE774", text); // Globe icon
+                            }
+                            else if (_viewModel.StatusText.StartsWith("Mode switched to:"))
+                            {
+                                var text = _viewModel.StatusText.Replace("Mode switched to: ", "");
+                                ShowNotificationState("\uE713", text); // Settings icon as generic mode
+                            }
+                            else if (_viewModel.StatusText.StartsWith("Error"))
+                            {
+                                ShowErrorState(_viewModel.StatusText);
+                            }
+                        }
+                        break;
+
                     case nameof(MainViewModel.IsRecording):
                     case nameof(MainViewModel.IsProcessing):
-                        UpdateHudState();
+                        if (_viewModel.IsOverlayVisible) UpdateHudState();
                         break;
 
                     case nameof(MainViewModel.AudioLevel):
@@ -83,26 +107,49 @@ public partial class OverlayWindow : Window
 
     private void FadeIn()
     {
-        var anim = new DoubleAnimation(0, 1, FastDuration) { EasingFunction = SmoothEase };
-        BeginAnimation(OpacityProperty, anim);
+        var opacityAnim = new DoubleAnimation(0, 1, FastDuration) { EasingFunction = SmoothEase };
+        var translateAnim = new DoubleAnimation(20, 0, FastDuration) { EasingFunction = SmoothEase };
+        
+        var transform = new TranslateTransform(0, 20);
+        this.RenderTransform = transform;
+        
+        BeginAnimation(OpacityProperty, opacityAnim);
+        transform.BeginAnimation(TranslateTransform.YProperty, translateAnim);
     }
 
     private void FadeOutAndHide()
     {
-        var anim = new DoubleAnimation(1, 0, FastDuration) { EasingFunction = SmoothEase };
-        anim.Completed += (s, e) =>
+        var opacityAnim = new DoubleAnimation(1, 0, FastDuration) { EasingFunction = SmoothEase };
+        var translateAnim = new DoubleAnimation(0, 20, FastDuration) { EasingFunction = SmoothEase };
+        
+        var transform = this.RenderTransform as TranslateTransform ?? new TranslateTransform(0, 0);
+        this.RenderTransform = transform;
+
+        opacityAnim.Completed += (s, e) =>
         {
             Hide();
             ShowIdleState();
         };
-        BeginAnimation(OpacityProperty, anim);
+        
+        BeginAnimation(OpacityProperty, opacityAnim);
+        transform.BeginAnimation(TranslateTransform.YProperty, translateAnim);
     }
 
     private void AnimateWidth(double targetWidth)
     {
-        var anim = new DoubleAnimation(Width, targetWidth, MediumDuration) { EasingFunction = SmoothEase };
-        anim.Completed += (s, e) => PositionOverlay();
-        BeginAnimation(WidthProperty, anim);
+        if (double.IsNaN(Width)) Width = ActualWidth;
+        if (double.IsNaN(Left)) PositionOverlay();
+
+        var widthAnim = new DoubleAnimation(Width, targetWidth, MediumDuration) { EasingFunction = SmoothEase };
+        
+        var screen = SystemParameters.WorkArea;
+        double targetLeft = (screen.Width - targetWidth) / 2;
+        var leftAnim = new DoubleAnimation(Left, targetLeft, MediumDuration) { EasingFunction = SmoothEase };
+        
+        widthAnim.Completed += (s, e) => PositionOverlay();
+        
+        BeginAnimation(WidthProperty, widthAnim);
+        BeginAnimation(LeftProperty, leftAnim);
     }
 
     private void UpdateHudState()
@@ -127,9 +174,12 @@ public partial class OverlayWindow : Window
         ListeningState.Visibility = Visibility.Collapsed;
         ProcessingState.Visibility = Visibility.Collapsed;
         SuccessState.Visibility = Visibility.Collapsed;
+        NotificationState.Visibility = Visibility.Collapsed;
         ErrorState.Visibility = Visibility.Collapsed;
         StopSparkleAnimation();
-        AnimateWidth(300);
+        UpdateGoldBorder(false);
+        IdleHalo.Visibility = _viewModel.IsVoxActive ? Visibility.Visible : Visibility.Collapsed;
+        AnimateWidth(340);
     }
 
     private void ShowListeningState()
@@ -138,10 +188,16 @@ public partial class OverlayWindow : Window
         ListeningState.Visibility = Visibility.Visible;
         ProcessingState.Visibility = Visibility.Collapsed;
         SuccessState.Visibility = Visibility.Collapsed;
+        NotificationState.Visibility = Visibility.Collapsed;
         ErrorState.Visibility = Visibility.Collapsed;
         StopSparkleAnimation();
-        UpdateGoldBorder(true);
-        AnimateWidth(460);
+        
+        bool isVoxActive = _viewModel.IsVoxActive;
+        ListeningText.Text = isVoxActive ? "Vox ouvindo..." : "Ouvindo...";
+        ListeningText.Foreground = isVoxActive ? new SolidColorBrush(Color.FromRgb(212, 175, 55)) : Brushes.White;
+        UpdateGoldBorder(isVoxActive);
+        
+        AnimateWidth(isVoxActive ? 520 : 460);
     }
 
     private void ShowProcessingState()
@@ -150,9 +206,15 @@ public partial class OverlayWindow : Window
         ListeningState.Visibility = Visibility.Collapsed;
         ProcessingState.Visibility = Visibility.Visible;
         SuccessState.Visibility = Visibility.Collapsed;
+        NotificationState.Visibility = Visibility.Collapsed;
         ErrorState.Visibility = Visibility.Collapsed;
         StartSparkleAnimation();
-        AnimateWidth(240);
+        
+        bool isVoxActive = _viewModel.IsVoxActive;
+        ProcessingText.Text = isVoxActive ? "Vox processando..." : "Processando...";
+        UpdateGoldBorder(isVoxActive);
+        
+        AnimateWidth(isVoxActive ? 300 : 260);
     }
 
     private void ShowSuccessState()
@@ -161,37 +223,69 @@ public partial class OverlayWindow : Window
         ListeningState.Visibility = Visibility.Collapsed;
         ProcessingState.Visibility = Visibility.Collapsed;
         SuccessState.Visibility = Visibility.Visible;
+        NotificationState.Visibility = Visibility.Collapsed;
         ErrorState.Visibility = Visibility.Collapsed;
         StopSparkleAnimation();
         UpdateGoldBorder(false);
-        AnimateWidth(200);
+        AnimateWidth(240);
 
         // Auto-hide with fade after 2 seconds
-        _successTimer?.Stop();
-        _successTimer = new System.Timers.Timer(2000);
-        _successTimer.Elapsed += (s, e) =>
-        {
-            _successTimer?.Stop();
-            Dispatcher.Invoke(FadeOutAndHide);
-        };
-        _successTimer.Start();
+        AutoHideTimer(2000);
     }
 
-    private void ShowErrorState(string message)
+    private void ShowNotificationState(string icon, string text)
     {
+        if (Visibility != Visibility.Visible || Opacity == 0)
+        {
+            PositionOverlay();
+            Show();
+            FadeIn();
+        }
+
         IdleState.Visibility = Visibility.Collapsed;
         ListeningState.Visibility = Visibility.Collapsed;
         ProcessingState.Visibility = Visibility.Collapsed;
         SuccessState.Visibility = Visibility.Collapsed;
+        NotificationState.Visibility = Visibility.Visible;
+        ErrorState.Visibility = Visibility.Collapsed;
+        
+        NotificationIcon.Text = icon;
+        NotificationText.Text = text;
+        
+        StopSparkleAnimation();
+        UpdateGoldBorder(true);
+        AnimateWidth(Math.Max(300, 100 + (text.Length * 8)));
+
+        AutoHideTimer(2500);
+    }
+
+    private void ShowErrorState(string message)
+    {
+        if (Visibility != Visibility.Visible || Opacity == 0)
+        {
+            PositionOverlay();
+            Show();
+            FadeIn();
+        }
+
+        IdleState.Visibility = Visibility.Collapsed;
+        ListeningState.Visibility = Visibility.Collapsed;
+        ProcessingState.Visibility = Visibility.Collapsed;
+        SuccessState.Visibility = Visibility.Collapsed;
+        NotificationState.Visibility = Visibility.Collapsed;
         ErrorState.Visibility = Visibility.Visible;
         ErrorText.Text = message.Replace("Error: ", "");
         StopSparkleAnimation();
         UpdateGoldBorder(false);
-        AnimateWidth(400);
+        AnimateWidth(440);
 
-        // Auto-hide with fade after 3 seconds
+        AutoHideTimer(3000);
+    }
+
+    private void AutoHideTimer(double milliseconds)
+    {
         _successTimer?.Stop();
-        _successTimer = new System.Timers.Timer(3000);
+        _successTimer = new System.Timers.Timer(milliseconds);
         _successTimer.Elapsed += (s, e) =>
         {
             _successTimer?.Stop();
@@ -220,25 +314,30 @@ public partial class OverlayWindow : Window
         if (isGold)
         {
             var brush = new LinearGradientBrush(
-                Color.FromArgb(102, 212, 175, 55),  // gold @ 0.4
-                Color.FromArgb(26, 212, 175, 55),   // gold @ 0.1
+                Color.FromArgb(255, 212, 175, 55),  // solid gold
+                Color.FromArgb(255, 232, 212, 139), // light gold
                 45);
             HudCapsule.BorderBrush = brush;
+            HudCapsule.Background = new SolidColorBrush(Color.FromRgb(31, 31, 31)); // slightly lighter surface
             HudCapsule.Effect = new System.Windows.Media.Effects.DropShadowEffect
             {
                 Color = Color.FromRgb(212, 175, 55),
-                BlurRadius = 12,
+                BlurRadius = 24,
                 ShadowDepth = 0,
-                Opacity = 0.2
+                Opacity = 0.3
             };
         }
         else
         {
-            HudCapsule.BorderBrush = new LinearGradientBrush(
-                Color.FromArgb(38, 255, 255, 255),
-                Color.FromArgb(5, 255, 255, 255),
-                45);
-            HudCapsule.Effect = null;
+            HudCapsule.BorderBrush = new SolidColorBrush(Color.FromRgb(42, 42, 42)); // subtle border
+            HudCapsule.Background = new SolidColorBrush(Color.FromRgb(26, 26, 26)); // default surface
+            HudCapsule.Effect = new System.Windows.Media.Effects.DropShadowEffect
+            {
+                Color = Colors.Black,
+                BlurRadius = 20,
+                ShadowDepth = 4,
+                Opacity = 0.6
+            };
         }
     }
 

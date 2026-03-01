@@ -137,42 +137,30 @@
                 <!-- HOME SECTION -->
                 <!-- ======================================== -->
                 <StackPanel Visibility="{Binding IsHomeVisible, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="Home" Style="{StaticResource H1Text}" Margin="0,0,0,24"/>
+                    <!-- Heading -->
+                    <TextBlock Text="{Binding Greeting}" Style="{StaticResource H1Text}" Margin="0,0,0,16"/>
 
-                    <!-- Current Mode & Language Cards -->
-                    <Grid Margin="0,0,0,16">
+                    <!-- Subheader Badges -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,32">
+                        <!-- Mode -->
+                        <TextBlock Text="&#xE8C4;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource GoldPrimary}" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12"/>
+                        <TextBlock Text="{Binding CurrentModeName}" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                        
+                        <!-- Language -->
+                        <TextBlock Text="{Binding CurrentLanguageFlag}" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12"/>
+                        <TextBlock Text="{Binding CurrentLanguageName}" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                        
+                        <!-- Shortcut Badge -->
+                        <Border Background="{StaticResource SurfaceBg}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="4" Padding="8,4">
+                            <TextBlock Text="Segure ⌥⌘ para gravar" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- 4 Stats Cards -->
+                    <Grid Margin="0,0,0,32">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="15"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Current Mode -->
-                        <Border Grid.Column="0" Style="{StaticResource SectionCard}" Margin="0">
-                            <StackPanel>
-                                <TextBlock Text="Modo Atual" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding CurrentModeIcon}" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="{StaticResource GoldPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <TextBlock Text="{Binding CurrentModeName}" Style="{StaticResource H3Text}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Current Language -->
-                        <Border Grid.Column="2" Style="{StaticResource SectionCard}" Margin="0">
-                            <StackPanel>
-                                <TextBlock Text="Idioma Atual" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding CurrentLanguageFlag}" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <TextBlock Text="{Binding CurrentLanguageName}" Style="{StaticResource H3Text}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-
-                    <!-- Stats Row -->
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="*"/>
@@ -180,102 +168,103 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
+                        <!-- Card 1: Transcricoes -->
                         <Border Grid.Column="0" Style="{StaticResource SectionCard}" Margin="0">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding TodayTranscriptions}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Hoje" Style="{StaticResource CaptionText}" HorizontalAlignment="Center"/>
+                            <StackPanel>
+                                <TextBlock Text="&#xE8D6;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="{StaticResource GoldPrimary}" Margin="0,0,0,16"/>
+                                <TextBlock Text="{Binding TotalTranscriptions}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Transcricoes" Style="{StaticResource CaptionText}" FontWeight="Medium" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="uso total" FontSize="11" Foreground="#5A5A5A" Margin="0,2,0,0"/>
                             </StackPanel>
                         </Border>
 
+                        <!-- Card 2: Tempo Gravado -->
                         <Border Grid.Column="2" Style="{StaticResource SectionCard}" Margin="0">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding TotalTranscriptions}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Total" Style="{StaticResource CaptionText}" HorizontalAlignment="Center"/>
+                            <StackPanel>
+                                <TextBlock Text="&#xE916;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="{StaticResource GoldPrimary}" Margin="0,0,0,16"/>
+                                <TextBlock Text="{Binding TotalRecordedTime}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Tempo Gravado" Style="{StaticResource CaptionText}" FontWeight="Medium" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="total acumulado" FontSize="11" Foreground="#5A5A5A" Margin="0,2,0,0"/>
                             </StackPanel>
                         </Border>
 
+                        <!-- Card 3: Modo Favorito -->
                         <Border Grid.Column="4" Style="{StaticResource SectionCard}" Margin="0">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding DailyStreak}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Dias Seguidos" Style="{StaticResource CaptionText}" HorizontalAlignment="Center"/>
+                            <StackPanel>
+                                <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="{StaticResource GoldPrimary}" Margin="0,0,0,16"/>
+                                <TextBlock Text="{Binding TopModeName}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Modo Favorito" Style="{StaticResource CaptionText}" FontWeight="Medium" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="mais utilizado" FontSize="11" Foreground="#5A5A5A" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 4: Idiomas -->
+                        <Border Grid.Column="6" Style="{StaticResource SectionCard}" Margin="0">
+                            <StackPanel>
+                                <TextBlock Text="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="{StaticResource GoldPrimary}" Margin="0,0,0,16"/>
+                                <TextBlock Text="{Binding NumberOfLanguages}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Idiomas" Style="{StaticResource CaptionText}" FontWeight="Medium" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="configurados" FontSize="11" Foreground="#5A5A5A" Margin="0,2,0,0"/>
                             </StackPanel>
                         </Border>
                     </Grid>
 
-                    <!-- Subscription Status -->
-                    <Border Style="{StaticResource SectionCard}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                    <TextBlock Text="Plano: " Style="{StaticResource CaptionText}"/>
-                                    <TextBlock Text="{Binding SubscriptionLabel}" Foreground="{StaticResource GoldPrimary}" FontWeight="Bold"/>
-                                </StackPanel>
-                                <TextBlock Text="{Binding UsageLabel}" Style="{StaticResource CaptionText}"/>
-                            </StackPanel>
-                            <Button Grid.Column="1" Content="Fazer Upgrade" Command="{Binding OpenSubscriptionPageCommand}"
-                                    Style="{StaticResource GoldButton}" VerticalAlignment="Center" Padding="16,8"
-                                    Visibility="{Binding IsPro, Converter={StaticResource InverseBoolToVis}}"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- Shortcut Hint -->
-                    <Border Style="{StaticResource SectionCard}">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="Segure para Gravar" Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="20,10">
-                                <TextBlock Text="{Binding ShortcutHint}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource GoldPrimary}"
-                                           HorizontalAlignment="Center" FontFamily="Consolas"/>
-                            </Border>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Recording Status -->
-                    <Border Style="{StaticResource SectionCard}">
-                        <StackPanel>
-                            <TextBlock Text="Status de Gravação" Style="{StaticResource H3Text}" Margin="0,0,0,12"/>
-                            <Grid Margin="0,0,0,4">
-                                <TextBlock Text="Motor:" HorizontalAlignment="Left" Style="{StaticResource CaptionText}"/>
-                                <TextBlock Text="{Binding ActiveEngine, FallbackValue='Nenhum'}" HorizontalAlignment="Right" FontSize="12"
-                                           Foreground="{StaticResource GoldPrimary}"/>
-                            </Grid>
-                            <TextBlock Text="{Binding RecordingStatus, FallbackValue='Pronto — segure Ctrl+Space para gravar'}" FontSize="12"
-                                       Foreground="{Binding RecordingStatusColor, Converter={StaticResource StringToColor}, FallbackValue='#D4AF37'}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Microphone Test -->
-                    <Border Style="{StaticResource SectionCard}" Margin="0">
-                        <StackPanel>
-                            <TextBlock Text="Teste de Microfone" Style="{StaticResource H3Text}" Margin="0,0,0,12"/>
-
-                            <!-- Level Bar -->
-                            <ProgressBar Minimum="0" Maximum="1" Value="{Binding MicTestLevel, Mode=OneWay}"
-                                         Height="8" Margin="0,0,0,12"
-                                         Background="{StaticResource AppBg}" Foreground="{StaticResource SuccessColor}" BorderThickness="0"/>
-
-                            <!-- Status -->
-                            <TextBlock Text="{Binding MicTestStatus}" Style="{StaticResource CaptionText}"
-                                       Foreground="{Binding MicTestStatusColor, Converter={StaticResource StringToColor}, FallbackValue='#8A8A8A'}" Margin="0,0,0,12"/>
-
-                            <!-- Test Button -->
-                            <Button Command="{Binding ToggleMicTestCommand}" HorizontalAlignment="Left">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource OutlineButton}">
-                                        <Setter Property="Content" Value="Testar Microfone"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsMicTesting}" Value="True">
-                                                <Setter Property="Content" Value="Parar Teste"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                        </StackPanel>
-                    </Border>
+                    <!-- Recentes -->
+                    <Grid Margin="0,0,0,16">
+                        <TextBlock Text="Recentes" Style="{StaticResource H3Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Button Content="Ver tudo" Style="{StaticResource LinkButton}" Foreground="{StaticResource GoldPrimary}" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    </Grid>
+                    
+                    <ItemsControl ItemsSource="{Binding RecentTranscriptions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="Transparent" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Padding="0,16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="40"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Colored mode dot -->
+                                        <Ellipse Grid.Column="0" Width="8" Height="8" Fill="{StaticResource GoldPrimary}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,6,0,0"/>
+                                        
+                                        <!-- Content -->
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="{Binding Text}" Style="{StaticResource BodyText}" Foreground="{StaticResource TextPrimary}" 
+                                                       TextWrapping="Wrap" MaxHeight="40" TextTrimming="CharacterEllipsis" Margin="0,0,0,8"/>
+                                            <!-- Meta info -->
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Mode}" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                                                <TextBlock Text="  •  " FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                                                <TextBlock Text="{Binding Timestamp, StringFormat='{}dd/MM HH:mm'}" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        
+                                        <!-- Copy Button -->
+                                        <Button Grid.Column="3" Content="&#xE8C8;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource SecondaryButton}" 
+                                                Foreground="{StaticResource TextSecondary}" Background="Transparent" BorderThickness="0"
+                                                ToolTip="Copiar texto" VerticalAlignment="Top" Margin="0,0,8,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    
+                    <!-- Empty state if no history -->
+                    <TextBlock Text="Você ainda não tem transcrições no histórico." Foreground="{StaticResource TextSecondary}" Style="{StaticResource BodyText}" Margin="0,16,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RecentTranscriptions.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
 
                 <!-- ======================================== -->
@@ -283,91 +272,233 @@
                 <!-- ======================================== -->
                 <StackPanel Visibility="{Binding IsLanguagesVisible, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="Idiomas" Style="{StaticResource H1Text}" Margin="0,0,0,8"/>
-                    <TextBlock Text="Selecione seu idioma de saída. O plano gratuito inclui Português e Inglês." Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,24"/>
+                    <TextBlock Text="Configure o idioma de saída das suas transcrições. Você pode falar em qualquer idioma - o VoxAiGo traduz automaticamente." Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,24"/>
+                    
+                    <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Margin="0,0,0,24"/>
 
-                    <!-- Search -->
-                    <TextBox Text="{Binding LanguageSearchText, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource DarkTextBox}" Margin="0,0,0,24">
-                        <TextBox.Tag>
-                            <TextBlock Text="Buscar idiomas..." Foreground="{StaticResource TextSecondary}"/>
-                        </TextBox.Tag>
-                    </TextBox>
+                    <!-- Idioma Atual -->
+                    <TextBlock Text="Idioma Atual" Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,8"/>
+                    <Border Style="{StaticResource SectionCard}" Margin="0,0,0,24" Padding="16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0" Text="{Binding CurrentLanguageFlag}" FontSize="32" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentLanguageName}" Style="{StaticResource H3Text}" Foreground="{StaticResource TextPrimary}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding SelectedLanguage, Source={x:Static local:SettingsManager.Shared}}" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0" FontFamily="Consolas" TextTransform="Uppercase"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="Atalho para alternar" Style="{StaticResource CaptionText}" FontSize="11" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Right" Margin="0,0,0,4"/>
+                                <Border Background="Transparent" BorderBrush="{StaticResource GoldPrimary}" BorderThickness="1" CornerRadius="4" Padding="8,4" HorizontalAlignment="Right">
+                                    <TextBlock Text="⌃⇧L" Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource GoldPrimary}"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                    <!-- Language Grid -->
-                    <ItemsControl ItemsSource="{Binding FilteredLanguages}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Command="{Binding DataContext.SelectLanguageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding Code}" Margin="4" Padding="0" BorderThickness="0" Cursor="Hand" Background="Transparent" Foreground="{StaticResource TextPrimary}">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border x:Name="card" CornerRadius="12" Padding="16,12" Width="160" Cursor="Hand"
-                                                    BorderThickness="2">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="{StaticResource SurfaceBg}"/>
-                                                        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                <Setter Property="Background" Value="{StaticResource SurfaceActiveBg}"/>
-                                                                <Setter Property="BorderBrush" Value="{StaticResource GoldPrimary}"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-                                                <StackPanel>
-                                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                                        <TextBlock Text="{Binding Flag}" FontSize="24" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                                        <TextBlock Text="{Binding DisplayName}" Style="{StaticResource BodyText}" FontWeight="Medium"
-                                                                   Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding Code}" Style="{StaticResource CaptionText}"
-                                                                   FontFamily="Consolas" Margin="0,0,12,0" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
-                                                        <Border CornerRadius="4" Padding="6,2" VerticalAlignment="Center" Visibility="{Binding IsFreeTier, Converter={StaticResource BoolToVis}}">
-                                                            <Border.Background>
-                                                                <SolidColorBrush Color="#34C759" Opacity="0.15"/>
-                                                            </Border.Background>
-                                                            <TextBlock Text="GRÁTIS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource SuccessColor}"/>
+                    <!-- Favoritos -->
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="Favoritos" Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Left"/>
+                        <TextBlock Text="{Binding FavoriteLanguagesItems.Count, StringFormat='{}{0} idiomas'}" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <TextBlock Text="Use ⌃⇧L para alternar rapidamente entre seus idiomas favoritos." Style="{StaticResource CaptionText}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,12"/>
+                    
+                    <Border Style="{StaticResource SectionCard}" Margin="0,0,0,24" Padding="16">
+                        <ItemsControl ItemsSource="{Binding FavoriteLanguagesItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="6" Background="Transparent" BorderThickness="1" Margin="0,0,8,8" x:Name="favBorder">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{StaticResource GoldPrimary}"/>
+                                                        <Setter Property="Background" Value="{StaticResource SurfaceActiveBg}"/>
+                                                    </DataTrigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource SurfaceHoverBg}"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Button Command="{Binding DataContext.SelectLanguageCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Code}"
+                                                    Background="Transparent" BorderThickness="0" Padding="12,8" Cursor="Hand">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                                            <ContentPresenter/>
                                                         </Border>
-                                                        <Border CornerRadius="4" Padding="6,2" VerticalAlignment="Center" Visibility="{Binding IsLocked, Converter={StaticResource BoolToVis}}">
-                                                            <Border.Background>
-                                                                <SolidColorBrush Color="#D4AF37" Opacity="0.15"/>
-                                                            </Border.Background>
-                                                            <TextBlock Text="PRO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}"/>
-                                                        </Border>
-                                                    </StackPanel>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Flag}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding DisplayName}" Style="{StaticResource BodyText}" FontWeight="Medium" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                                                 </StackPanel>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="card" Property="Background" Value="{StaticResource SurfaceHoverBg}"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
+                                            </Button>
+                                            
+                                            <Button x:Name="removeBtn" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="10" 
+                                                    Command="{Binding DataContext.RemoveFavoriteLanguageCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Code}"
+                                                    Width="20" Height="20" Background="{StaticResource SurfaceHoverBg}" Foreground="{StaticResource TextSecondary}" 
+                                                    BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-4,0" Visibility="Collapsed" Cursor="Hand"/>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="removeBtn" Property="Visibility" Value="Visible"/>
+                                        </Trigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+
+                    <!-- Adicionar Idioma -->
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="Adicionar Idioma" Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        
+                        <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Right" Width="240" Padding="8,4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE71E;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding LanguageSearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                         Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextPrimary}" 
+                                         VerticalAlignment="Center">
+                                    <TextBox.Template>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <Grid>
+                                                <ScrollViewer x:Name="PART_ContentHost" Background="Transparent" />
+                                                <TextBlock Text="Buscar..." Foreground="{StaticResource TextSecondary}" Margin="2,0,0,0" VerticalAlignment="Center"
+                                                           Visibility="{Binding Text.IsEmpty, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVis}}" />
+                                            </Grid>
                                         </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                    </TextBox.Template>
+                                </TextBox>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    
+                    <Border Style="{StaticResource SectionCard}" Margin="0,0,0,24" MinHeight="100" Padding="0">
+                        <Grid>
+                            <!-- Search Results List -->
+                            <ItemsControl ItemsSource="{Binding FilteredLanguages}" Visibility="{Binding LanguageSearchText, Converter={StaticResource StringToVis}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Margin="16"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding DataContext.AddFavoriteLanguageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding Code}" Margin="0,0,8,8" Padding="0" BorderThickness="0" Cursor="Hand" Background="Transparent">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="6" Background="{StaticResource SurfaceHoverBg}" BorderThickness="1" BorderBrush="Transparent" Padding="12,8">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Flag}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                            <TextBlock Text="{Binding DisplayName}" Style="{StaticResource BodyText}" FontWeight="Medium" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                                            <Border Margin="8,0,0,0" CornerRadius="4" Padding="6,2" VerticalAlignment="Center" Visibility="{Binding IsLocked, Converter={StaticResource BoolToVis}}">
+                                                                <Border.Background>
+                                                                    <SolidColorBrush Color="#D4AF37" Opacity="0.15"/>
+                                                                </Border.Background>
+                                                                <TextBlock Text="PRO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}"/>
+                                                            </Border>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            
+                            <!-- Empty State (Empty Search) -->
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40"
+                                        Visibility="{Binding LanguageSearchText, Converter={StaticResource InverseStringToVis}}">
+                                <TextBlock Text="&#xE8F4;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                <TextBlock Text="Digite o nome de um idioma para adicionar aos favoritos" Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Dica Vox -->
+                    <Border Background="#1A150A" BorderBrush="{StaticResource GoldPrimary}" BorderThickness="1" CornerRadius="8" Padding="16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xEB41;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="{StaticResource GoldPrimary}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Dica Vox" Style="{StaticResource BodyText}" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Com o Vox ativo, você pode trocar o idioma durante a gravação dizendo o nome do idioma. Ex: &#x22;in english&#x22;, &#x22;in portuguese&#x22;" Style="{StaticResource CaptionText}" FontSize="12" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </StackPanel>
 
                 <!-- ======================================== -->
                 <!-- MODES SECTION -->
                 <!-- ======================================== -->
                 <StackPanel Visibility="{Binding IsModesVisible, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="Modos de Transcrição" Style="{StaticResource H1Text}" Margin="0,0,0,8"/>
-                    <TextBlock Text="Escolha como sua voz é processada. O plano gratuito inclui o modo Texto." Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,24"/>
+                    <TextBlock Text="Modos" Style="{StaticResource H1Text}" Margin="0,0,0,8"/>
+                    <TextBlock Text="Como o VoxAiGo deve processar suas gravações. O plano gratuito inclui o modo Texto." Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,24"/>
+                    
+                    <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Margin="0,0,0,24"/>
 
-                    <ItemsControl ItemsSource="{Binding Modes}">
+                    <!-- Modo Atual -->
+                    <TextBlock Text="Modo Atual" Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,8"/>
+                    <Border Style="{StaticResource SectionCard}" Margin="0,0,0,24" Padding="16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Border Grid.Column="0" Width="48" Height="48" CornerRadius="8" Background="#1A150A" BorderBrush="{StaticResource GoldPrimary}" BorderThickness="1" Margin="0,0,16,0">
+                                <TextBlock Text="{Binding CurrentModeIcon}" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="{StaticResource GoldPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentModeName}" Style="{StaticResource H3Text}" Foreground="{StaticResource TextPrimary}" FontWeight="Bold"/>
+                                <TextBlock Text="Criatividade: Balanceada" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="Atalho para alternar" Style="{StaticResource CaptionText}" FontSize="11" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Right" Margin="0,0,0,4"/>
+                                <Border Background="Transparent" BorderBrush="{StaticResource GoldPrimary}" BorderThickness="1" CornerRadius="4" Padding="8,4" HorizontalAlignment="Right">
+                                    <TextBlock Text="⌃⇧M" Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource GoldPrimary}"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Modos Disponíveis -->
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="Todos os Modos" Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Left"/>
+                        <TextBlock Text="{Binding Modes.Count, StringFormat='{}{0} modos'}" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <TextBlock Text="Use ⌃⇧M para alternar rapidamente entre os modos disponíveis." Style="{StaticResource CaptionText}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,12"/>
+
+                    <ItemsControl ItemsSource="{Binding Modes}" Margin="0,0,0,24">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel/>
+                                <WrapPanel Margin="-4"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
@@ -404,11 +535,15 @@
                                                             </Border.Background>
                                                             <TextBlock Text="GRÁTIS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource SuccessColor}"/>
                                                         </Border>
+                                                        <!-- Pro Badge with Icon -->
                                                         <Border CornerRadius="4" Padding="6,2" Visibility="{Binding IsLocked, Converter={StaticResource BoolToVis}}">
                                                             <Border.Background>
                                                                 <SolidColorBrush Color="#D4AF37" Opacity="0.15"/>
                                                             </Border.Background>
-                                                            <TextBlock Text="PRO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}"/>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="&#xE72E;" FontFamily="Segoe MDL2 Assets" FontSize="9" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="PRO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource GoldPrimary}" VerticalAlignment="Center"/>
+                                                            </StackPanel>
                                                         </Border>
                                                     </StackPanel>
                                                 </StackPanel>
@@ -424,8 +559,31 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </StackPanel>
+                    
+                    <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Margin="0,0,0,24"/>
 
+                    <!-- Conversation Reply Toggle Box -->
+                    <Border Style="{StaticResource SectionCard}" Padding="16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="{StaticResource SurfaceHoverBg}" BorderThickness="1" BorderBrush="{StaticResource BorderColor}" Margin="0,0,16,0">
+                                <TextBlock Text="&#xE8F2;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,16,0">
+                                <TextBlock Text="Conversation Reply" Style="{StaticResource BodyText}" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Quando ativo, o VoxAiGo irá não apenas transcrever, mas também gerar uma sugestão de resposta para a conversa detectada no áudio." Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <ToggleButton Grid.Column="2" VerticalAlignment="Center" IsChecked="{Binding EnableConversationReply, Mode=TwoWay}" Style="{StaticResource CustomToggleSwitch}"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
                 <!-- ======================================== -->
                 <!-- SNIPPETS SECTION -->
                 <!-- ======================================== -->

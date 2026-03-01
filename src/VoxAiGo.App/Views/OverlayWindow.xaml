@@ -6,8 +6,8 @@
         xmlns:controls="clr-namespace:VoxAiGo.App.Controls"
         xmlns:vm="clr-namespace:VoxAiGo.App.ViewModels"
         mc:Ignorable="d"
-        Title="VoxAiGo Overlay" Height="72" Width="300"
-        WindowStyle="None" AllowsTransparency="False" Background="#141414"
+        Title="VoxAiGo Overlay" Height="120" Width="340"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
 
@@ -33,16 +33,26 @@
     </Window.Resources>
 
     <!-- Capsule HUD — matches macOS "Matte Black &amp; Gold" design -->
-    <Border x:Name="HudCapsule" CornerRadius="24" Padding="24,14" BorderThickness="2" Background="#1F1F1F" BorderBrush="#D4AF37">
+    <Border x:Name="HudCapsule" CornerRadius="28" Padding="24,14" BorderThickness="2" Background="#1A1A1A" BorderBrush="#2A2A2A" Margin="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="4" Opacity="0.6"/>
+        </Border.Effect>
 
         <Grid>
             <!-- STATE 1: IDLE — "Ctrl+Space hold to talk" (shown when not recording and not processing) -->
             <StackPanel x:Name="IdleState" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <!-- Mic icon circle -->
-                <Border Background="{StaticResource TextPrimary}" CornerRadius="14" Width="28" Height="28" Margin="0,0,12,0">
-                    <TextBlock Text="&#xE720;" FontFamily="Segoe MDL2 Assets" FontSize="14"
-                               Foreground="{StaticResource AppBg}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
+                <Grid Margin="0,0,12,0">
+                    <Border x:Name="IdleHalo" Background="#1AD4AF37" CornerRadius="20" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#D4AF37" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+                        </Border.Effect>
+                    </Border>
+                    <Border Background="{StaticResource TextPrimary}" CornerRadius="14" Width="28" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE720;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                   Foreground="{StaticResource AppBg}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
                 <TextBlock Text="Segure" Style="{StaticResource BodyText}" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,12,0"/>
                 <!-- Shortcut badge -->
                 <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="8,4">
@@ -70,7 +80,7 @@
                 <Border Width="1" Height="28" Background="{StaticResource BorderColor}" Margin="8,0"/>
 
                 <!-- Status text -->
-                <TextBlock Text="Ouvindo..." Style="{StaticResource BodyText}" Foreground="{StaticResource TextPrimary}" FontWeight="Medium"
+                <TextBlock x:Name="ListeningText" Text="Ouvindo..." Style="{StaticResource BodyText}" Foreground="{StaticResource TextPrimary}" FontWeight="Medium"
                            VerticalAlignment="Center" Margin="12,0,16,0"/>
 
                 <!-- Language pill -->
@@ -97,7 +107,7 @@
                         <RotateTransform x:Name="SparkleRotation" Angle="0"/>
                     </TextBlock.RenderTransform>
                 </TextBlock>
-                <TextBlock Text="Processando..." Foreground="{StaticResource GoldPrimary}" Style="{StaticResource BodyText}" FontWeight="Medium"
+                <TextBlock x:Name="ProcessingText" Text="Processando..." Foreground="{StaticResource GoldPrimary}" Style="{StaticResource BodyText}" FontWeight="Medium"
                            VerticalAlignment="Center"/>
             </StackPanel>
 
@@ -107,6 +117,15 @@
                 <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="18"
                            Foreground="{StaticResource SuccessColor}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <TextBlock Text="Colado" Foreground="{StaticResource SuccessColor}" Style="{StaticResource BodyText}" FontWeight="Medium"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- STATE 5: NOTIFICATION — (Used for Mode/Language changes) -->
+            <StackPanel x:Name="NotificationState" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="Collapsed">
+                <TextBlock x:Name="NotificationIcon" Text="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                           Foreground="{StaticResource GoldPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock x:Name="NotificationText" Text="Modo: Chat" Foreground="{StaticResource TextPrimary}" Style="{StaticResource BodyText}" FontWeight="Medium"
                            VerticalAlignment="Center"/>
             </StackPanel>
 

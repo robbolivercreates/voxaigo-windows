@@ -58,6 +58,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _statusText = "";
 
+    public bool IsVoxActive => GetTranscriptionService() == TranscriptionServiceType.Supabase || 
+                               GetTranscriptionService() == TranscriptionServiceType.Byok;
+
     private IntPtr _savedWindowHandle;
 
     // Conversation Reply mode: set when Ctrl+Space is pressed during conversation HUD
