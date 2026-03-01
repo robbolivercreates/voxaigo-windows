@@ -30,7 +30,7 @@ public class SupabaseTranscriptionService : ITranscriptionService
         var audioBase64 = Convert.ToBase64String(audioData);
         var stylePrompt = WritingStyleManager.Shared.GetStylePrompt();
         var wakeWord = SettingsManager.Shared.WakeWord;
-        var prompt = PromptBuilder.Build(mode, outputLanguage, clarifyText: false,
+        var prompt = PromptBuilder.Build(mode, outputLanguage, clarifyText: SettingsManager.Shared.ClarifyText,
             wakeWord: wakeWord, styleSamples: stylePrompt);
 
         var payload = new
@@ -38,9 +38,9 @@ public class SupabaseTranscriptionService : ITranscriptionService
             audio = audioBase64,
             mode = mode.GetApiName(),
             language = outputLanguage.Code,
-            prompt,
+            systemPrompt = prompt,
             temperature = mode.GetTemperature(),
-            maxTokens = mode.GetMaxOutputTokens()
+            maxOutputTokens = mode.GetMaxOutputTokens()
         };
 
         var jsonBody = JsonSerializer.Serialize(payload);

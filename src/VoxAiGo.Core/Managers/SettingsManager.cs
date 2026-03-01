@@ -40,6 +40,7 @@ public class SettingsManager
         public const string RefreshToken = "refresh_token";
 
         // SaaS-specific keys
+        public const string ClarifyText = "clarify_text";
         public const string ByokEnabled = "byok_enabled";
         public const string ByokApiKey = "byok_api_key";
         public const string OfflineMode = "offline_mode";
@@ -198,6 +199,13 @@ public class SettingsManager
     {
         get => GetString(Keys.WakeWord, "Vox");
         set => Set(Keys.WakeWord, value);
+    }
+
+    // --- Clarify Text (default true, same as macOS) ---
+    public bool ClarifyText
+    {
+        get => GetBool(Keys.ClarifyText, true);
+        set => Set(Keys.ClarifyText, value);
     }
 
     // --- BYOK (Bring Your Own Key) - Easter egg ---

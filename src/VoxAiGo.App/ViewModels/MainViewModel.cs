@@ -435,7 +435,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task PasteTextAsync(string text)
     {
-        // 1. Set Clipboard (Must be STA) — retry for COMException (clipboard locked)
+        // 1. Save current clipboard contents before overwriting (mirrors macOS ClipboardHelper)
+        IDataObject? savedClipboard = null;
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            try { savedClipboard = Clipboard.GetDataObject(); }
+            catch { /* Clipboard may be locked — proceed without saving */ }
+        });
+
+        // 2. Set Clipboard (Must be STA) — retry for COMException (clipboard locked)
         Application.Current.Dispatcher.Invoke(() =>
         {
             for (int attempt = 0; attempt < 10; attempt++)
@@ -446,7 +454,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Clipboard.SetText(text);
         });
 
-        // 2. Restore Focus to the previously active window
+        // 3. Restore Focus to the previously active window
         if (_savedWindowHandle != IntPtr.Zero)
         {
             uint currentThread = NativeMethods.GetCurrentThreadId();
@@ -457,7 +465,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             NativeMethods.AttachThreadInput(currentThread, targetThread, false);
         }
 
-        // 3. Poll for focus restoration (up to 500ms) instead of fixed delay
+        // 4. Poll for focus restoration (up to 500ms) instead of fixed delay
         for (int i = 0; i < 50; i++)
         {
             if (_savedWindowHandle == IntPtr.Zero || NativeMethods.GetForegroundWindow() == _savedWindowHandle)
@@ -466,7 +474,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         await Task.Delay(50); // Small extra buffer for IDE input readiness
 
-        // 4. Simulate Ctrl+V with scan codes (required for modern apps like VS Code)
+        // 5. Simulate Ctrl+V with scan codes (required for modern apps like VS Code)
         var inputs = new NativeMethods.INPUT[4];
 
         // Ctrl Down (with scan code + extended key flag)
@@ -495,6 +503,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         uint sent = NativeMethods.SendInput(4, inputs, Marshal.SizeOf(typeof(NativeMethods.INPUT)));
         System.Diagnostics.Debug.WriteLine($"[Paste] SendInput sent {sent}/4 events, target={_savedWindowHandle}, focused={NativeMethods.GetForegroundWindow()}");
+
+        // 6. Restore original clipboard after paste is processed (mirrors macOS 300ms delay)
+        if (savedClipboard != null)
+        {
+            await Task.Delay(300);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                try { Clipboard.SetDataObject(savedClipboard, false); }
+                catch { /* Best effort — clipboard may be locked */ }
+            });
+        }
     }
 
     private void HandleWakeWordCommand(WakeWordResult result)

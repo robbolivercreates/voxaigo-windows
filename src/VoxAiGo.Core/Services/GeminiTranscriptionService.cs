@@ -25,7 +25,7 @@ public class GeminiTranscriptionService : ITranscriptionService
     {
         var stylePrompt = WritingStyleManager.Shared.GetStylePrompt();
         var wakeWord = SettingsManager.Shared.WakeWord;
-        var prompt = PromptBuilder.Build(mode, outputLanguage, clarifyText: false,
+        var prompt = PromptBuilder.Build(mode, outputLanguage, clarifyText: SettingsManager.Shared.ClarifyText,
             wakeWord: wakeWord, styleSamples: stylePrompt);
         var audioBase64 = Convert.ToBase64String(audioData);
 
