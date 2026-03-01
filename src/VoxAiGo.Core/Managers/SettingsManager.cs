@@ -196,7 +196,7 @@ public class SettingsManager
 
     public string WakeWord
     {
-        get => GetString(Keys.WakeWord, "Hey Vox");
+        get => GetString(Keys.WakeWord, "Vox");
         set => Set(Keys.WakeWord, value);
     }
 

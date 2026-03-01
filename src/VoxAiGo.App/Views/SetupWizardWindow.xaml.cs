@@ -50,7 +50,7 @@ public partial class SetupWizardWindow : Window
         {
             if (_auth.IsLoggedIn && _currentStep == 0)
             {
-                AuthStatusText.Text = "✓ Signed in!";
+                AuthStatusText.Text = "✓ Login realizado!";
                 AuthStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0, 204, 136));
                 _ = Task.Delay(800).ContinueWith(_ => Dispatcher.Invoke(() => AdvanceTo(1)));
             }
@@ -122,12 +122,12 @@ public partial class SetupWizardWindow : Window
 
         if (step == TotalSteps - 1)
         {
-            NextBtn.Content = "Finish ✓";
+            NextBtn.Content = "Finalizar ✓";
             NextBtn.Width = 120;
         }
         else
         {
-            NextBtn.Content = "Next →";
+            NextBtn.Content = "Próximo →";
             NextBtn.Width = 110;
         }
     }
@@ -169,7 +169,7 @@ public partial class SetupWizardWindow : Window
         if (_currentStep == 0 && !_auth.IsLoggedIn)
         {
             // User chose to skip auth — that's OK (SkipAuthBtn handles it; NextBtn on step 0 tries sign-in)
-            AuthStatusText.Text = "Sign in or click 'Continue without account' to proceed.";
+            AuthStatusText.Text = "Faça login ou clique em 'Continuar sem conta' para prosseguir.";
             AuthStatusText.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 102));
             return;
         }
@@ -192,7 +192,7 @@ public partial class SetupWizardWindow : Window
     private async void GoogleBtn_Click(object sender, RoutedEventArgs e)
     {
         GoogleBtn.IsEnabled = false;
-        AuthStatusText.Text = "Opening browser for Google sign-in...";
+        AuthStatusText.Text = "Abrindo navegador para login com Google...";
         AuthStatusText.Foreground = new SolidColorBrush(Color.FromRgb(212, 175, 55));
         _auth.SignInWithGoogle();
         // Auth result comes via UserChanged event
@@ -207,7 +207,7 @@ public partial class SetupWizardWindow : Window
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) return;
 
         SignInBtn.IsEnabled = false;
-        AuthStatusText.Text = "Signing in...";
+        AuthStatusText.Text = "Entrando...";
         AuthStatusText.Foreground = new SolidColorBrush(Color.FromRgb(212, 175, 55));
 
         var ok = await _auth.SignInAsync(email, password);
@@ -218,7 +218,7 @@ public partial class SetupWizardWindow : Window
         }
         else
         {
-            AuthStatusText.Text = "Invalid email or password.";
+            AuthStatusText.Text = "E-mail ou senha inválidos.";
             AuthStatusText.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 102));
         }
         SignInBtn.IsEnabled = true;
@@ -248,15 +248,15 @@ public partial class SetupWizardWindow : Window
             try { device = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console); }
             catch
             {
-                MicStatusText.Text = "No microphone found! Check your audio settings.";
+                MicStatusText.Text = "Nenhum microfone encontrado! Verifique as configurações de áudio.";
                 MicStatusText.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 102));
                 return;
             }
 
-            MicStatusText.Text = "Listening... speak now!";
+            MicStatusText.Text = "Ouvindo... fale agora!";
             MicStatusText.Foreground = new SolidColorBrush(Color.FromRgb(212, 175, 55));
             MicLevelBar.Value = 0;
-            MicTestBtn.Content = "Stop Test";
+            MicTestBtn.Content = "Parar Teste";
             _isMicTesting = true;
             _micTestPassed = false;
             MicPassedText.Visibility = Visibility.Collapsed;
@@ -299,7 +299,7 @@ public partial class SetupWizardWindow : Window
                         MicLevelBar.Value = MicLevelBar.Value * 0.5 + level * 0.5;
                         if (detected)
                         {
-                            MicStatusText.Text = "Microphone working! Speech detected.";
+                            MicStatusText.Text = "Microfone funcionando! Fala detectada.";
                             MicStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0, 204, 136));
                             MicPassedText.Visibility = Visibility.Visible;
                             _micTestPassed = true;
@@ -327,7 +327,7 @@ public partial class SetupWizardWindow : Window
                 {
                     if (_isMicTesting && !_micTestPassed)
                     {
-                        MicStatusText.Text = "No speech detected. Check mic permissions and input device.";
+                        MicStatusText.Text = "Nenhuma fala detectada. Verifique permissões e dispositivo de entrada.";
                         MicStatusText.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 102));
                     }
                     StopMicTest();
@@ -338,7 +338,7 @@ public partial class SetupWizardWindow : Window
         }
         catch (Exception ex)
         {
-            MicStatusText.Text = $"Mic error: {ex.Message}";
+            MicStatusText.Text = $"Erro no microfone: {ex.Message}";
             MicStatusText.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 102));
             _isMicTesting = false;
         }
@@ -354,7 +354,7 @@ public partial class SetupWizardWindow : Window
         Dispatcher.Invoke(() =>
         {
             MicLevelBar.Value = 0;
-            MicTestBtn.Content = "Test Microphone";
+            MicTestBtn.Content = "Testar Microfone";
         });
     }
 
@@ -368,7 +368,7 @@ public partial class SetupWizardWindow : Window
         Dispatcher.Invoke(() =>
         {
             RecordingWaitText.Foreground = new SolidColorBrush(Color.FromRgb(0, 204, 136));
-            RecordingWaitText.Text = "✓ Transcription received!";
+            RecordingWaitText.Text = "✓ Transcrição recebida!";
             RecordingResultText.Text = text.Length > 120 ? text[..120] + "…" : text;
             RecordingSuccessBorder.Visibility = Visibility.Visible;
 
@@ -479,7 +479,7 @@ public partial class SetupWizardWindow : Window
         Dispatcher.Invoke(() =>
         {
             WakeWordSuccessText.Visibility = Visibility.Visible;
-            WakeWordStatusText.Text = "Wake word command detected!";
+            WakeWordStatusText.Text = "Comando de voz detectado!";
             WakeWordStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0, 204, 136));
             _ = Task.Delay(1200).ContinueWith(_ => Dispatcher.Invoke(() =>
             {

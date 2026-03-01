@@ -23,7 +23,7 @@ public static class WakeWordDetector
     /// Checks if the transcribed text starts with the wake word and contains a command.
     /// Returns null if no wake word command detected.
     /// </summary>
-    public static WakeWordResult? Detect(string text, string wakeWord = "Hey Vox")
+    public static WakeWordResult? Detect(string text, string wakeWord = "Vox")
     {
         if (string.IsNullOrWhiteSpace(text)) return null;
 
@@ -32,8 +32,8 @@ public static class WakeWordDetector
 
         // Check all wake word variants
         var variants = new List<string> { wakeWordLower };
-        if (wakeWordLower == "hey vox")
-            variants.AddRange(["ei vox", "hey fox", "hey box", "a vox", "hey vocs"]);
+        if (wakeWordLower == "vox")
+            variants.AddRange(["fox", "box", "vocs", "vóx"]);
 
         string? matchedVariant = null;
         foreach (var variant in variants)

@@ -763,8 +763,8 @@
                         <StackPanel>
                             <Grid Margin="0,0,0,12">
                                 <StackPanel HorizontalAlignment="Left">
-                                    <TextBlock Text="Comandos de Voz" Style="{StaticResource H3Text}"/>
-                                    <TextBlock Text="Alternar modos usando sua voz" Style="{StaticResource CaptionText}" Margin="0,4,0,0"/>
+                                    <TextBlock Text="Agente Vox por Voz" Style="{StaticResource H3Text}"/>
+                                    <TextBlock Text="Controle modos e idiomas com sua voz" Style="{StaticResource CaptionText}" Margin="0,4,0,0"/>
                                 </StackPanel>
                                 <CheckBox Content="Habilitar" IsChecked="{Binding WakeWordEnabled}" Style="{StaticResource DarkCheckBox}" Foreground="{StaticResource GoldPrimary}"
                                           HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -777,9 +777,12 @@
                                 </Grid>
                                 <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="12,8">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap">
-                                            <Run Text="Diga &quot;"/><Run Text="{Binding WakeWord, Mode=OneWay}" Foreground="{StaticResource GoldPrimary}"/><Run Text=", E-mail&quot; para alternar para o modo E-mail"/>
+                                        <TextBlock Style="{StaticResource CaptionText}" FontWeight="SemiBold" Foreground="{StaticResource GoldPrimary}" Margin="0,0,0,6" Text="Como usar:"/>
+                                        <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="1. Pressione e segure Ctrl+Space" Margin="0,2"/>
+                                        <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap" Margin="0,2">
+                                            <Run Text="2. Fale: &quot;"/><Run Text="{Binding WakeWord, Mode=OneWay}" Foreground="{StaticResource GoldPrimary}"/><Run Text=", E-mail&quot;"/>
                                         </TextBlock>
+                                        <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="3. Solte o botão" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -793,7 +796,7 @@
                             <Grid>
                                 <TextBlock Text="Gravar" Style="{StaticResource BodyText}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                 <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="10,4" HorizontalAlignment="Right">
-                                    <TextBlock Text="Alt + Win (segurar)" FontFamily="Consolas" Style="{StaticResource CaptionText}" Foreground="{StaticResource GoldPrimary}"/>
+                                    <TextBlock Text="Ctrl + Space (segurar)" FontFamily="Consolas" Style="{StaticResource CaptionText}" Foreground="{StaticResource GoldPrimary}"/>
                                 </Border>
                             </Grid>
                         </StackPanel>

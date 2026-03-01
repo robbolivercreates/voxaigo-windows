@@ -435,8 +435,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task PasteTextAsync(string text)
     {
-        // 1. Set Clipboard (Must be STA)
-        Application.Current.Dispatcher.Invoke(() => Clipboard.SetText(text));
+        // 1. Set Clipboard (Must be STA) — retry for COMException (clipboard locked)
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            for (int attempt = 0; attempt < 10; attempt++)
+            {
+                try { Clipboard.SetText(text); return; }
+                catch (System.Runtime.InteropServices.COMException) { System.Threading.Thread.Sleep(50); }
+            }
+            Clipboard.SetText(text);
+        });
 
         // 2. Restore Focus to the previously active window
         if (_savedWindowHandle != IntPtr.Zero)

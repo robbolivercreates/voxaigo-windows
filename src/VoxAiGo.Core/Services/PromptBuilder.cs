@@ -28,7 +28,7 @@ public static class PromptBuilder
         Output ONLY the clean, final intended message.
         """;
 
-    public static string Build(TranscriptionMode mode, SpeechLanguage outputLanguage, bool clarifyText, string wakeWord = "Hey Vox", string customInstruction = "", string styleSamples = "")
+    public static string Build(TranscriptionMode mode, SpeechLanguage outputLanguage, bool clarifyText, string wakeWord = "Vox", string customInstruction = "", string styleSamples = "")
     {
         var basePrompt = mode switch
         {
@@ -291,9 +291,9 @@ public static class PromptBuilder
         // Wake word passthrough (Highest Priority)
         var baseWake = wakeWord.ToLowerInvariant();
         var variants = new List<string> { baseWake };
-        if (baseWake == "hey vox")
+        if (baseWake == "vox")
         {
-            variants.AddRange(["ei vox", "hey fox", "hey box", "a vox", "hey vocs"]);
+            variants.AddRange(["fox", "box", "vocs", "vóx"]);
         }
         var variantsStr = string.Join(", ", variants.Select(v => $"'{v}'"));
 
@@ -307,9 +307,9 @@ public static class PromptBuilder
             Do NOT translate the wake word or command into any language.
             Do NOT apply mode formatting, language translation, or any cleanup.
             Keep the exact words the user said, in the exact language they said them.
-            Example: if the user says "Hey Vox, email" → return exactly "Hey Vox, email".
-            Example: if the user says "Hey Vox, inglês" → return exactly "Hey Vox, inglês" (NOT "Hey Vox, English" or a Turkish translation).
-            Example: if the user says "Hey Vox, próximo idioma" → return exactly "Hey Vox, próximo idioma".
+            Example: if the user says "Vox, email" → return exactly "Vox, email".
+            Example: if the user says "Vox, inglês" → return exactly "Vox, inglês" (NOT "Vox, English" or a Turkish translation).
+            Example: if the user says "Vox, próximo idioma" → return exactly "Vox, próximo idioma".
             Only apply all previous rules when the audio does NOT start with the wake word.
             """);
 

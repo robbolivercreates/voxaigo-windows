@@ -163,8 +163,8 @@ public partial class App : Application
             Dispatcher.Invoke(() =>
             {
                 var result = MessageBox.Show(
-                    "Voice commands (Hey Vox) are a Pro feature.\n\nUpgrade to Pro for unlimited AI transcriptions, all 15 modes, 30 languages, and voice commands.\n\nOpen upgrade page?",
-                    "VoxAiGo Pro Required",
+                    "Comandos de voz (Agente Vox) são um recurso Pro.\n\nFaça upgrade para Pro e tenha transcrições ilimitadas, todos os 15 modos, 30 idiomas e comandos de voz.\n\nAbrir página de upgrade?",
+                    "VoxAiGo Pro Necessário",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Information);
                 if (result == MessageBoxResult.Yes)
@@ -200,17 +200,37 @@ public partial class App : Application
         // 4. Create System Tray Icon
         CreateTrayIcon();
 
-        // 5. Show main window on launch
-        _mainWindow?.Show();
-        _mainWindow?.Activate();
-
-        // 6. Show Setup Wizard on first launch
+        // 5. Gate behind login: show wizard first if not completed, then main window
         if (!SettingsManager.Shared.HasCompletedSetup)
         {
+            // Show Setup Wizard (includes login step 0) — main window stays hidden
             _wizardWindow = new SetupWizardWindow(_authService);
-            _wizardWindow.Owner = _mainWindow;
+            _wizardWindow.Closed += (s, args) =>
+            {
+                // Wizard finished or closed — now show main window
+                _mainWindow?.Show();
+                _mainWindow?.Activate();
+            };
             _wizardWindow.Show();
             _wizardWindow.Activate();
+        }
+        else if (!_authService.IsLoggedIn)
+        {
+            // Setup done but not logged in — show wizard at login step, main window hidden
+            _wizardWindow = new SetupWizardWindow(_authService);
+            _wizardWindow.Closed += (s, args) =>
+            {
+                _mainWindow?.Show();
+                _mainWindow?.Activate();
+            };
+            _wizardWindow.Show();
+            _wizardWindow.Activate();
+        }
+        else
+        {
+            // Already logged in and setup complete — show main window directly
+            _mainWindow?.Show();
+            _mainWindow?.Activate();
         }
     }
 

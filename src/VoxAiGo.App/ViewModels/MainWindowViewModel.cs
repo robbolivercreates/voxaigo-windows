@@ -268,7 +268,7 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private bool _byokEnabled = false;
     [ObservableProperty] private bool _playSounds = true;
     [ObservableProperty] private bool _wakeWordEnabled = false;
-    [ObservableProperty] private string _wakeWord = "Hey Vox";
+    [ObservableProperty] private string _wakeWord = "Vox";
     [ObservableProperty] private bool _useLocalModel = false;
     [ObservableProperty] private bool _isDownloading = false;
     [ObservableProperty] private double _downloadProgress = 0;
