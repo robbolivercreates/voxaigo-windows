@@ -10,6 +10,7 @@ public partial class OverlayWindow : Window
     private readonly MainViewModel _viewModel;
     private Storyboard? _sparkleStoryboard;
     private System.Timers.Timer? _successTimer;
+    private bool _isShowingNotification; // Prevents FadeOut from hiding an incoming notification
     private static readonly Duration FastDuration = new(TimeSpan.FromMilliseconds(200));
     private static readonly Duration MediumDuration = new(TimeSpan.FromMilliseconds(300));
     private static readonly IEasingFunction SmoothEase = new CubicEase { EasingMode = EasingMode.EaseInOut };
@@ -32,7 +33,14 @@ public partial class OverlayWindow : Window
                     case nameof(MainViewModel.IsOverlayVisible):
                         if (_viewModel.IsOverlayVisible)
                         {
-                            if (Visibility != Visibility.Visible || Opacity == 0)
+                            // Cancel any pending auto-hide timer and fade-out animation
+                            // from a previous success/notification/error state
+                            _successTimer?.Stop();
+                            _isShowingNotification = false;
+                            BeginAnimation(OpacityProperty, null); // Cancel fade-out
+                            Opacity = 1;
+
+                            if (Visibility != Visibility.Visible)
                             {
                                 PositionOverlay();
                                 Show();
@@ -107,12 +115,14 @@ public partial class OverlayWindow : Window
 
     private void FadeIn()
     {
+        _isShowingNotification = false;
         var opacityAnim = new DoubleAnimation(0, 1, FastDuration) { EasingFunction = SmoothEase };
-        var translateAnim = new DoubleAnimation(20, 0, FastDuration) { EasingFunction = SmoothEase };
-        
+
+        // Animate slide-up on the HudCapsule (Window doesn't support RenderTransform)
         var transform = new TranslateTransform(0, 20);
-        this.RenderTransform = transform;
-        
+        HudCapsule.RenderTransform = transform;
+        var translateAnim = new DoubleAnimation(20, 0, FastDuration) { EasingFunction = SmoothEase };
+
         BeginAnimation(OpacityProperty, opacityAnim);
         transform.BeginAnimation(TranslateTransform.YProperty, translateAnim);
     }
@@ -120,17 +130,21 @@ public partial class OverlayWindow : Window
     private void FadeOutAndHide()
     {
         var opacityAnim = new DoubleAnimation(1, 0, FastDuration) { EasingFunction = SmoothEase };
+
+        // Animate slide-down on the HudCapsule (Window doesn't support RenderTransform)
+        var transform = HudCapsule.RenderTransform as TranslateTransform ?? new TranslateTransform(0, 0);
+        HudCapsule.RenderTransform = transform;
         var translateAnim = new DoubleAnimation(0, 20, FastDuration) { EasingFunction = SmoothEase };
-        
-        var transform = this.RenderTransform as TranslateTransform ?? new TranslateTransform(0, 0);
-        this.RenderTransform = transform;
 
         opacityAnim.Completed += (s, e) =>
         {
+            // Don't hide if a notification was shown while we were fading out
+            if (_isShowingNotification)
+                return;
             Hide();
             ShowIdleState();
         };
-        
+
         BeginAnimation(OpacityProperty, opacityAnim);
         transform.BeginAnimation(TranslateTransform.YProperty, translateAnim);
     }
@@ -235,11 +249,15 @@ public partial class OverlayWindow : Window
 
     private void ShowNotificationState(string icon, string text)
     {
-        if (Visibility != Visibility.Visible || Opacity == 0)
+        // Cancel any pending fade-out that might hide this notification
+        _isShowingNotification = true;
+        BeginAnimation(OpacityProperty, null); // Stop fade-out animation
+        Opacity = 1;
+
+        if (Visibility != Visibility.Visible)
         {
             PositionOverlay();
             Show();
-            FadeIn();
         }
 
         IdleState.Visibility = Visibility.Collapsed;
@@ -261,11 +279,15 @@ public partial class OverlayWindow : Window
 
     private void ShowErrorState(string message)
     {
-        if (Visibility != Visibility.Visible || Opacity == 0)
+        // Cancel any pending fade-out
+        _isShowingNotification = true;
+        BeginAnimation(OpacityProperty, null);
+        Opacity = 1;
+
+        if (Visibility != Visibility.Visible)
         {
             PositionOverlay();
             Show();
-            FadeIn();
         }
 
         IdleState.Visibility = Visibility.Collapsed;
@@ -289,7 +311,11 @@ public partial class OverlayWindow : Window
         _successTimer.Elapsed += (s, e) =>
         {
             _successTimer?.Stop();
-            Dispatcher.Invoke(FadeOutAndHide);
+            Dispatcher.Invoke(() =>
+            {
+                _isShowingNotification = false;
+                FadeOutAndHide();
+            });
         };
         _successTimer.Start();
     }

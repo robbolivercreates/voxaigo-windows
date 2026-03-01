@@ -145,6 +145,8 @@ public partial class App : Application
                 {
                     mainWindowVm.SyncModeFromPipeline(_viewModel.CurrentMode);
                     mainWindowVm.ShowToast($"Mode: {_viewModel.CurrentMode}", "#D4A017");
+                    UpdateTrayModeChecks();
+                    if (_trayModeItem != null) _trayModeItem.Header = GetTrayModeLabel();
                 });
             }
             if (e.PropertyName == nameof(MainViewModel.CurrentLanguage))
@@ -153,6 +155,8 @@ public partial class App : Application
                 {
                     mainWindowVm.SyncLanguageFromPipeline(_viewModel.CurrentLanguage);
                     mainWindowVm.ShowToast($"Language: {_viewModel.CurrentLanguage.DisplayName} {_viewModel.CurrentLanguage.Flag}", "#D4A017");
+                    UpdateTrayLanguageChecks();
+                    if (_trayModeItem != null) _trayModeItem.Header = GetTrayModeLabel();
                 });
             }
         };
@@ -269,6 +273,8 @@ public partial class App : Application
 
     private System.Windows.Controls.MenuItem? _trayStatusItem;
     private System.Windows.Controls.MenuItem? _trayModeItem;
+    private System.Windows.Controls.MenuItem? _trayModeParent;
+    private System.Windows.Controls.MenuItem? _trayLanguageParent;
 
     private void CreateTrayIcon()
     {
@@ -307,6 +313,30 @@ public partial class App : Application
                 System.Windows.Media.Color.FromRgb(136, 136, 136))
         };
 
+        // --- Mode submenu ---
+        _trayModeParent = new System.Windows.Controls.MenuItem { Header = "Mode" };
+        var currentMode = _viewModel?.CurrentMode ?? TranscriptionMode.Text;
+        foreach (var mode in Enum.GetValues<TranscriptionMode>())
+        {
+            var modeItem = new System.Windows.Controls.MenuItem
+            {
+                Header = mode.ToString(),
+                IsCheckable = true,
+                IsChecked = mode == currentMode
+            };
+            var capturedMode = mode;
+            modeItem.Click += (s, args) =>
+            {
+                _viewModel?.UpdateMode(capturedMode.ToString());
+                UpdateTrayModeChecks();
+            };
+            _trayModeParent.Items.Add(modeItem);
+        }
+
+        // --- Language submenu (favorites first, then all) ---
+        _trayLanguageParent = new System.Windows.Controls.MenuItem { Header = "Language" };
+        BuildLanguageSubmenu();
+
         var settingsItem = new System.Windows.Controls.MenuItem { Header = "Settings" };
         settingsItem.Click += (s, args) =>
         {
@@ -321,6 +351,9 @@ public partial class App : Application
         contextMenu.Items.Add(_trayStatusItem);
         contextMenu.Items.Add(_trayModeItem);
         contextMenu.Items.Add(new System.Windows.Controls.Separator());
+        contextMenu.Items.Add(_trayModeParent);
+        contextMenu.Items.Add(_trayLanguageParent);
+        contextMenu.Items.Add(new System.Windows.Controls.Separator());
         contextMenu.Items.Add(settingsItem);
         contextMenu.Items.Add(new System.Windows.Controls.Separator());
         contextMenu.Items.Add(quitItem);
@@ -334,6 +367,79 @@ public partial class App : Application
 
         // Update tray on subscription changes
         SubscriptionManager.Shared.SubscriptionChanged += UpdateTrayMenu;
+    }
+
+    private void BuildLanguageSubmenu()
+    {
+        if (_trayLanguageParent == null) return;
+        _trayLanguageParent.Items.Clear();
+
+        var currentLangCode = SettingsManager.Shared.GetString(SettingsManager.Keys.SelectedLanguage, "en");
+
+        // Common languages first
+        var favorites = new[] { "pt", "en", "es", "fr", "de", "it", "ja", "ko", "zh" };
+        foreach (var code in favorites)
+        {
+            var lang = SpeechLanguage.All.FirstOrDefault(l => l.Code == code);
+            if (lang == null) continue;
+            var item = new System.Windows.Controls.MenuItem
+            {
+                Header = $"{lang.Flag} {lang.DisplayName}",
+                IsCheckable = true,
+                IsChecked = lang.Code == currentLangCode
+            };
+            var capturedLang = lang;
+            item.Click += (s, args) =>
+            {
+                _viewModel?.UpdateLanguage(capturedLang.Code);
+                UpdateTrayLanguageChecks();
+            };
+            _trayLanguageParent.Items.Add(item);
+        }
+
+        _trayLanguageParent.Items.Add(new System.Windows.Controls.Separator());
+
+        // All other languages
+        foreach (var lang in SpeechLanguage.All.Where(l => !favorites.Contains(l.Code)))
+        {
+            var item = new System.Windows.Controls.MenuItem
+            {
+                Header = $"{lang.Flag} {lang.DisplayName}",
+                IsCheckable = true,
+                IsChecked = lang.Code == currentLangCode
+            };
+            var capturedLang = lang;
+            item.Click += (s, args) =>
+            {
+                _viewModel?.UpdateLanguage(capturedLang.Code);
+                UpdateTrayLanguageChecks();
+            };
+            _trayLanguageParent.Items.Add(item);
+        }
+    }
+
+    private void UpdateTrayModeChecks()
+    {
+        if (_trayModeParent == null || _viewModel == null) return;
+        var current = _viewModel.CurrentMode.ToString();
+        foreach (var item in _trayModeParent.Items.OfType<System.Windows.Controls.MenuItem>())
+        {
+            item.IsChecked = item.Header?.ToString() == current;
+        }
+        if (_trayModeItem != null) _trayModeItem.Header = GetTrayModeLabel();
+    }
+
+    private void UpdateTrayLanguageChecks()
+    {
+        if (_trayLanguageParent == null || _viewModel == null) return;
+        var currentCode = _viewModel.CurrentLanguage.Code;
+        var currentFlag = _viewModel.CurrentLanguage.Flag;
+        foreach (var item in _trayLanguageParent.Items.OfType<System.Windows.Controls.MenuItem>())
+        {
+            var header = item.Header?.ToString() ?? "";
+            item.IsChecked = header.Contains(currentFlag);
+        }
+        if (_trayModeItem != null) _trayModeItem.Header = GetTrayModeLabel();
     }
 
     private void OpenCheckoutWithEmail()
@@ -355,6 +461,8 @@ public partial class App : Application
         {
             if (_trayStatusItem != null) _trayStatusItem.Header = GetTrayStatusLabel();
             if (_trayModeItem != null) _trayModeItem.Header = GetTrayModeLabel();
+            UpdateTrayModeChecks();
+            UpdateTrayLanguageChecks();
         });
     }
 

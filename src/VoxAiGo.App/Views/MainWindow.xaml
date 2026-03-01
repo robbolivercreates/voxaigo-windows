@@ -253,7 +253,7 @@
                     </ItemsControl>
                     
                     <!-- Empty state if no history -->
-                    <TextBlock Text="Você ainda não tem transcrições no histórico." Foreground="{StaticResource TextSecondary}" Style="{StaticResource BodyText}" Margin="0,16,0,0">
+                    <TextBlock Text="Você ainda não tem transcrições no histórico." Foreground="{StaticResource TextSecondary}" Margin="0,16,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -289,7 +289,7 @@
                             <TextBlock Grid.Column="0" Text="{Binding CurrentLanguageFlag}" FontSize="32" Margin="0,0,16,0" VerticalAlignment="Center"/>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding CurrentLanguageName}" Style="{StaticResource H3Text}" Foreground="{StaticResource TextPrimary}" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding SelectedLanguage, Source={x:Static local:SettingsManager.Shared}}" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0" FontFamily="Consolas" TextTransform="Uppercase"/>
+                                <TextBlock Text="{Binding CurrentLanguageName}" Style="{StaticResource CaptionText}" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0" FontFamily="Consolas"/>
                             </StackPanel>
                             
                             <StackPanel Grid.Column="2" VerticalAlignment="Center">

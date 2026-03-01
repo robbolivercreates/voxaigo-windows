@@ -315,6 +315,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 return;
             }
 
+            // Skip if recording too short (< 0.3s) or no speech detected
+            if (audioSeconds < 0.3)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MainViewModel] Skipped: too short ({audioSeconds:F2}s)");
+                StatusText = "";
+                return;
+            }
+
+            if (!_audioRecorder.SpeechDetected)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MainViewModel] Skipped: no speech detected (level too low)");
+                StatusText = "";
+                return;
+            }
+
             // MARK: Conversation Reply path (translate speech → detected language)
             if (IsConversationReplyMode)
             {
@@ -544,6 +559,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 _settings.Set(SettingsManager.Keys.SelectedMode, result.Mode.Value.ToString());
                 _sound.PlaySuccess();
                 WizardBus.FireWakeWord();
+                // Clear overlay BEFORE setting StatusText so notification handler conditions are met
+                IsProcessing = false;
+                IsOverlayVisible = false;
                 StatusText = $"Mode switched to: {result.Mode.Value}";
                 break;
 
@@ -559,14 +577,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 _settings.Set(SettingsManager.Keys.SelectedLanguage, result.Language.Code);
                 _sound.PlaySuccess();
                 WizardBus.FireWakeWord();
+                // Clear overlay BEFORE setting StatusText so notification handler conditions are met
+                IsProcessing = false;
+                IsOverlayVisible = false;
                 StatusText = $"Language switched to: {result.Language.DisplayName} {result.Language.Flag}";
                 break;
 
             case WakeWordResultType.NextLanguage:
+                // Clear overlay before cycling (CycleLanguage sets StatusText)
+                IsProcessing = false;
+                IsOverlayVisible = false;
                 CycleLanguage(forward: true);
                 break;
 
             case WakeWordResultType.PreviousLanguage:
+                // Clear overlay before cycling (CycleLanguage sets StatusText)
+                IsProcessing = false;
+                IsOverlayVisible = false;
                 CycleLanguage(forward: false);
                 break;
 

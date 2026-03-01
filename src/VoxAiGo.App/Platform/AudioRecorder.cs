@@ -24,8 +24,10 @@ public partial class AudioRecorder : ObservableObject, IDisposable
     public void Start(string? deviceId = null)
     {
         Stop(); // Ensure clean state
+        SpeechDetected = false;
+        _smoothedLevel = 0;
 
-        var device = deviceId != null 
+        var device = deviceId != null
             ? new MMDeviceEnumerator().GetDevice(deviceId) 
             : new MMDeviceEnumerator().GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console);
 

@@ -24,8 +24,8 @@ public class AuthService
     public event Action? UserChanged;
 
     private const int OAuthPort = 43824;
-    // Use the same redirect URL as macOS (already whitelisted in Supabase)
-    private const string OAuthRedirectUrl = "voxaigo://auth/callback";
+    // Windows uses localhost redirect (custom protocol schemes require registry on Windows)
+    private const string OAuthRedirectUrl = "http://localhost:43824/auth/callback";
 
     public AuthService()
     {

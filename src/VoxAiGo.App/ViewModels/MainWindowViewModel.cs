@@ -425,11 +425,12 @@ public partial class MainWindowViewModel : ObservableObject
         else if (hour < 18) Greeting = "Boa tarde";
         else Greeting = "Boa noite";
 
-        var minutes = _historyService.Records.Sum(r => r.DurationMs) / 60000;
+        var totalSeconds = _analytics.TotalAudioSeconds;
+        var minutes = (int)(totalSeconds / 60);
         TotalRecordedTime = $"{minutes / 60}h {minutes % 60}m";
 
         var topMode = _historyService.Records.GroupBy(r => r.Mode).OrderByDescending(g => g.Count()).FirstOrDefault();
-        TopModeName = topMode?.Key ?? "Texto";
+        TopModeName = topMode?.Key.ToString() ?? "Texto";
 
         NumberOfLanguages = _settings.FavoriteLanguages.Count > 0 ? _settings.FavoriteLanguages.Count : 2;
     }
